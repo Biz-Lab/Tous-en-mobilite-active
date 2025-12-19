@@ -17,9 +17,10 @@ int counterUnit = 1;
 uint32_t nextCounterUpdate = 0;
 
 // Obtenir les slots actuels pour chaque durée
-uint32_t getCurrentSlot1H() { return (time()-1735686000) / SLOT_1H_DURATION; }
-uint32_t getCurrentSlot3H() { return (time()-1735686000) / SLOT_3H_DURATION; }
-uint32_t getCurrentSlot6H() { return (time()-1735686000) / SLOT_6H_DURATION; }
+#define timeStampStart 1735686000
+uint32_t getCurrentSlot1H() { return (time()-timeStampStart) / SLOT_1H_DURATION; }
+uint32_t getCurrentSlot3H() { return (time()-timeStampStart) / SLOT_3H_DURATION; }
+uint32_t getCurrentSlot6H() { return (time()-timeStampStart) / SLOT_6H_DURATION; }
 
 // Obtenir les clés de stockage pour chaque type de slot
 String getSlotKey1H(uint32_t slot) { return "h1_" + String(slot); }
@@ -338,7 +339,7 @@ void counterDetailsDisplay() {
   for (uint32_t slot = dailySlotThreshold + 1; slot <= currentSlot1H; slot++) {
     String slotKey = getSlotKey1H(slot);
     uint16_t slotCount = storageReadUShort(slotKey.c_str(), 0);
-    if (slotCount > 0) { debugTrace("Debug", "SlotKey1H;"+slotKey+";"+String(slot*SLOT_1H_DURATION+1735686000)+";"+slotCount); } 
+    if (slotCount > 0) { debugTrace("Debug", "SlotKey1H;"+slotKey+";"+String(slot*SLOT_1H_DURATION+timeStampStart)+";"+slotCount); } 
   } 
   // ===== Recalcul du compteur hebdomadaire (slots 3h) =====
   debugTrace("Debug","weeklyCounter = " + String(weeklyCounter));
@@ -346,7 +347,7 @@ void counterDetailsDisplay() {
   for (uint32_t slot = weeklySlotThreshold + 1; slot <= currentSlot3H; slot++) {
     String slotKey = getSlotKey3H(slot);
     uint16_t slotCount = storageReadUShort(slotKey.c_str(), 0);
-    if (slotCount > 0) { debugTrace("Debug", "SlotKey3H;"+slotKey+";"+String(slot*SLOT_3H_DURATION+1735686000)+";"+slotCount); } 
+    if (slotCount > 0) { debugTrace("Debug", "SlotKey3H;"+slotKey+";"+String(slot*SLOT_3H_DURATION+timeStampStart)+";"+slotCount); } 
   }
   // ===== Recalcul du compteur mensuel (slots 6h) =====
   debugTrace("Debug","monthlyCounter = " + String(monthlyCounter));
@@ -354,7 +355,7 @@ void counterDetailsDisplay() {
   for (uint32_t slot = monthlySlotThreshold + 1; slot <= currentSlot6H; slot++) {
     String slotKey = getSlotKey6H(slot);
     uint16_t slotCount = storageReadUShort(slotKey.c_str(), 0);
-    if (slotCount > 0) { debugTrace("Debug", "SlotKey6H;"+slotKey+";"+String(slot*SLOT_6H_DURATION+1735686000)+";"+slotCount); } 
+    if (slotCount > 0) { debugTrace("Debug", "SlotKey6H;"+slotKey+";"+String(slot*SLOT_6H_DURATION+timeStampStart)+";"+slotCount); } 
   } 
   storageClose();
 }  

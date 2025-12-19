@@ -1,6 +1,7 @@
 #define ModuleQty 8
 #define ModuleColQty 4
 #define ModuleRowQty 2
+#define displayDebug false
 
 LedControl led = LedControl(displayDataInPin,displayClkPin,displayLoadPin1,displayLoadPin2,ModuleQty);
 bool displayOn = false;
@@ -289,14 +290,13 @@ void displayShow2Lines(String line1, String line2, int duration) {
       } }
       xOffset+= font_width + fontDef->space;
   } }
-/* Debug 
-  for (int y = 0; y < matrixHeight; y++) {
-    for (int x = 0; x < matrixWidth; x++) {
-      if(view[x][y]) { Serial.print("x"); } else { Serial.print(" "); };
-    }
-    debugTrace("Event","");
-  }
-*/
+  if(displayDebug) {
+    for (int y = 0; y < matrixHeight; y++) {
+      for (int x = 0; x < matrixWidth; x++) {
+        if(view[x][y]) { Serial.print("x"); } else { Serial.print(" "); };
+      }
+      debugTrace("Event","");
+  } }
 // Envoi de la vue à l'écran
   for (int row = 0; row < ModuleRowQty ; row++) {
     for (int col = 0; col < ModuleColQty; col++) {

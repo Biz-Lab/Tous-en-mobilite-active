@@ -58,17 +58,27 @@ uint32_t storageReadUInt(const char *key, uint32_t defaultValue = 0);
 bool storageWriteUInt(const char *key, uint32_t value);
 String storageReadString(const char *key, String defaultValue = "");
 bool storageWriteString(const char *key, String value);
+bool storageRemove(const char *key);
+
+// id.ino
+String idGet();
+void idShow();
+void idPwdAction();
+String hwVersionGet();
+String smallHmacCompute(String messageToHash);
+void factorySetup();
 
 // counters.ino
 void countersInit();
 void countersSave();
 void countersInc();
-void countersRefuseInc(int extraClick);
+void countersRefuseInc();
 void countersPrint();
 void counterTestValues(int16_t valuesCount);
 
 // display.ino
 void displayShowMonoLine(String text, int duration=0);
+void displayShow2Lines(String line1, String line2, int duration);
 
 // displayControl.ino
 class LedControl {
@@ -99,6 +109,7 @@ class LedControl {
 void soundOk(bool forceSoundActif = false);
 void soundKo(bool forceSoundActif = false);
 void soundBip(bool forceSoundActif = false);
+void soundConfigToggle();
 
 // display.ino Structure pour définir une police
 struct FontDefStruct {
@@ -109,6 +120,14 @@ struct FontDefStruct {
 };
 
 // web.ino
+bool webStorageReadBool(const char *key, bool defaultValue);
+bool webStorageWriteBool(const char *key, bool value);
+uint16_t webStorageReadUShort(const char *key, uint16_t defaultValue);
+bool webStorageWriteUShort(const char *key, uint16_t value);
 String serverGetString(String dataKey);
 int32_t serverGetInt(String dataKey, uint32_t defaultValue=-1);
 bool serverPostData(String action, String data = "");
+
+// time.ino
+uint32_t time();
+bool isTimeReliable();

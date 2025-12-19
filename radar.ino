@@ -74,7 +74,7 @@ void radarTest() {
     debugTrace("Test","Radar : "+String(currentStationaryDistance)+" / "+String(currentMovingDistance));
     displayShow2Lines(" " + String(currentStationaryDistance)," " + String(currentMovingDistance),0); 
     testStationaryDistance=currentStationaryDistance;
-    testMovingDistance!=currentMovingDistance;
+    testMovingDistance=currentMovingDistance;
   } else {
     displayShow2Lines("Radar","Out 2",0);
   }
