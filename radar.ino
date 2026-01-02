@@ -1,5 +1,4 @@
 //** Gestion du radar de présence
-
 #define RADAR_SERIAL Serial1
 #include <ld2410.h>
 ld2410 radar;
@@ -21,10 +20,16 @@ void radarInit() {
   watchDogReset();
 }
 
-int smoothedDistance = 999;
-int smoothedStationaryDistance = 999;
-int smoothedMovingDistance = 999;
-int radarStart = -1;
+int smoothedDistance = 300;
+int smoothedStationaryDistance = 300;
+int smoothedMovingDistance = 300;
+int previousSmoothedStationaryDistance = 300;
+int previousSmoothedMovingDistance = 300;
+uint32_t radarLatestPresenceDetected = 0;
+uint32_t radarLatestUserActionDetected = 0;
+uint32_t radarPresenceIdleSeconds = 0;
+
+#define smoothedRatio 0.05
 void radarLoop() {
   // Activation du radar uniquement après une actions utilisateur
   // if(radarIsNewUser) { return; };
@@ -32,51 +37,41 @@ void radarLoop() {
   radar.read();
   uint16_t realTimeStationaryDistance = 300;
   if(radar.stationaryTargetDetected()) { realTimeStationaryDistance = radar.stationaryTargetDistance(); }
-  smoothedStationaryDistance = floor(0.1 * realTimeStationaryDistance + 0.9 * smoothedStationaryDistance);
+  smoothedStationaryDistance = floor(smoothedRatio * realTimeStationaryDistance + (1 - smoothedRatio) * smoothedStationaryDistance);
   uint16_t realTimeMovingDistance = 300;
   if(radar.movingTargetDetected()) { realTimeMovingDistance = radar.movingTargetDistance(); }
-  smoothedMovingDistance = floor(0.1 * realTimeMovingDistance + 0.9 * smoothedMovingDistance);
+  smoothedMovingDistance = floor(smoothedRatio * realTimeMovingDistance + (1 - smoothedRatio) * smoothedMovingDistance);
   // Lissage de la mesure pour éviter les faux positifs
   smoothedDistance = min(smoothedStationaryDistance,smoothedMovingDistance); 
   // Détection de la présence d'une personne
-  radarIsUserPresent = (smoothedDistance<RadarProximityEntryThreshold());
+  if((abs(previousSmoothedStationaryDistance - smoothedStationaryDistance) >= 10) || (abs(previousSmoothedMovingDistance - smoothedMovingDistance) >= 10)) {
+    radarIsUserPresent = true;
+    previousSmoothedStationaryDistance = smoothedStationaryDistance;
+    previousSmoothedMovingDistance = smoothedMovingDistance;
+    radarLatestPresenceDetected = millis();
+    powerSavingOnIdle(0);
+  } else {
+    radarPresenceIdleSeconds = (int)((millis() - radarLatestPresenceDetected)/1000.0);
+    powerSavingOnIdle(radarPresenceIdleSeconds);
+  }
   // Réactivation de la possibilité d'un nouveau +1 après un délais minimum, si la personne sort de la zône radar ou après un délais maximum
-  uint32_t delay = (millis()-radarStart)/1000;
-  if(delay<newUserMinDelay()) { return; }
-  if((smoothedDistance>RadarProximityExitThreshold())||(delay>newUserMaxDelay())) { 
+  uint32_t delaySeconds = (millis()-radarLatestUserActionDetected)/1000;
+  if(delaySeconds < newUserMinDelay) { return; }
+  if((smoothedDistance > RadarProximityExitThreshold)||(delaySeconds > newUserMaxDelay)) { 
     radarIsNewUser = true; 
-    //debugTrace("Debug", "New user : " + String(smoothedDistance) + "cm after " + String(delay) + "s");  soundDebug(); 
 } }
 
 String radarDistanceGet() {
-  return String(smoothedStationaryDistance) + " / " +  String(smoothedMovingDistance);
+  return String(previousSmoothedStationaryDistance) + " / " +  String(previousSmoothedMovingDistance);
 }
 
 bool radarNewUser() { return radarIsNewUser; }
-void radarDisableUser() { radarIsNewUser = false; radarStart = millis(); };
-bool radarUserPresence() { return true; } //{ return radarIsUserPresent; }
+void radarDisableUser() { radarIsNewUser = false; radarLatestUserActionDetected = millis(); }
+bool radarUserPresence() { return (radarPresenceIdleSeconds < 300); } 
 
 // ** Fonction test ****************** 
-int testStationaryDistance = 0;
-int testMovingDistance = 0;
+#if MODE_DEBUG
 void radarTest() {
-  uint32_t currentTime = millis();
-  if(currentTime < radarNextRead) { return; }; 
-  radarNextRead = currentTime+500;
-  radar.read();
-  if(!radar.isConnected()) { debugTrace("Test","Radar : Not connected"); displayShow2Lines("Radar","Ko",0); return; }
-  if(!radar.presenceDetected()) { debugTrace("Test","Radar : No presence detected"); displayShow2Lines("Radar","Out 1",0); return; }
-  int currentStationaryDistance = 999;
-  int currentMovingDistance = 999;
-  if(radar.stationaryTargetDetected()) { currentStationaryDistance = 10*floor(radar.stationaryTargetDistance()/10); }
-  if(radar.movingTargetDetected()) { currentMovingDistance = 10*floor(radar.movingTargetDistance()/10); }
-  if((currentStationaryDistance!=testStationaryDistance)||(currentMovingDistance!=testMovingDistance)) { 
-    debugTrace("Test","Radar : "+String(currentStationaryDistance)+" / "+String(currentMovingDistance));
-    displayShow2Lines(" " + String(currentStationaryDistance)," " + String(currentMovingDistance),0); 
-    testStationaryDistance=currentStationaryDistance;
-    testMovingDistance=currentMovingDistance;
-  } else {
-    displayShow2Lines("Radar","Out 2",0);
-  }
-  delay(500);
+  displayShow2Lines(String(previousSmoothedStationaryDistance),String(previousSmoothedMovingDistance) + " " + String(radarPresenceIdleSeconds),60);
 }
+#endif // MODE_DEBUG

@@ -17,9 +17,9 @@ int32_t serverGetInt(String dataKey, uint32_t defaultValue) {
   return serverReturn.toInt();
 }
 
-bool serverPostData(String action,String data) {
-  if (!isWebAvailable()) { return false; }
-  if (wifiCheck()==false) { return false; }
+String serverPostData(String action, String data, bool getServerReturn) {
+  if (!isWebAvailable()) { return "Erreur"; }
+  if (wifiCheck()==false) { return "Erreur"; }
   // Préparation des données POST
   String random = String(millis());
   if(data.length()>0) { data = "&" + data; };
@@ -28,11 +28,13 @@ bool serverPostData(String action,String data) {
   postData = postData + "&s=" + smallHmacCompute(postData);
   // Envoi de la requête 
   String serverReturn = serverQuery(postData);
-  if (serverReturn==("Ok-"+action+"-"+random)) { 
-    return true;
+  if (serverReturn==("Ok-" + action + "-" + random)) { 
+    return "Ok";
+  } else if (serverReturn=="Erreur") {
+    return "Erreur";
   } else {
-    if(serverReturn!="Erreur") { errorLog(1002,"serverPostData issue : Send = " + postData + " | Return = " + serverReturn); }
-    return false;
+    if(!getServerReturn) { errorLog(1002,"serverPostData issue : Return = " + serverReturn + ", Sent = " + postData); }
+    return serverReturn;
   }
 }  
 
@@ -54,6 +56,8 @@ String serverQuery(String postData) {
 }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void webApiTest() {
   if(serverPostData("testApi",""))  { debugTrace("Test","Web test Ok"); } else { debugTrace("Test","Web test issue"); };
 }
+#endif // MODE_DEBUG

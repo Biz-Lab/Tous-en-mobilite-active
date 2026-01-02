@@ -5,11 +5,11 @@
 //** Détection si le système est à jour 
 void otaInit() {
   if(!isWifiAvailable()) { return; };
-  int currentVersion = currentSoftwareVersion();
+  int currentVersion = CURRENT_SOFTWARE_VERSION;
   int webLatestVersion = serverGetInt("getLatestFirmwareVersion");
   if(currentVersion>=webLatestVersion) {
     debugTrace("Event","Software version OK (v" + String(currentVersion) + ")");
-    webStorageWriteUInt(storageKeyCurrentFirmwareVersion,currentSoftwareVersion());
+    webStorageWriteUInt(storageKeyCurrentFirmwareVersion,CURRENT_SOFTWARE_VERSION,"");
   } else {
     debugTrace("Event","A new version of software is available (v" + String(webLatestVersion) + " vs " + String(currentVersion) + ")");
     otaUpdatePerform();

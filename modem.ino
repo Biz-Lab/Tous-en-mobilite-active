@@ -1,5 +1,5 @@
 // Gestion de la connexion internet
-
+#if GPRS_HARDWARE
 //TODO
 
 #define TINY_GSM_MODEM_SIM800
@@ -228,3 +228,5 @@ void modem4GTest() {
 void modemWifiTest() {
   debugTrace("TODO","modemWifiTest not dev");
 }
+
+#endif // GPRS_HARDWARE

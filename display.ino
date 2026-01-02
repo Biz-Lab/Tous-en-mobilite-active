@@ -290,6 +290,7 @@ void displayShow2Lines(String line1, String line2, int duration) {
       } }
       xOffset+= font_width + fontDef->space;
   } }
+  #if MODE_DEBUG
   if(displayDebug) {
     for (int y = 0; y < matrixHeight; y++) {
       for (int x = 0; x < matrixWidth; x++) {
@@ -297,6 +298,7 @@ void displayShow2Lines(String line1, String line2, int duration) {
       }
       debugTrace("Event","");
   } }
+  #endif // MODE_DEBUG
 // Envoi de la vue à l'écran
   for (int row = 0; row < ModuleRowQty ; row++) {
     for (int col = 0; col < ModuleColQty; col++) {
@@ -359,17 +361,34 @@ void displaytest99() {
   };
 }
 
+void displayTurnOn() {
+  // Réallumage
+  displaySetIntensity(15);
+  displayOn = true;
+  // Réaffichage du message
+  displayCounterOffUntil = 0;
+  String line1 = displayedLine1;
+  String line2 = displayedLine2;
+  displayedLine1 = "";
+  displayedLine2 = "";
+  displayShow2Lines(line1,line2,0);
+}
+
 void displayTurnOff() {
   displayOn = false;
   for (int moduleAddr = 0; moduleAddr < ModuleQty; moduleAddr++) {
-    led.shutdown(moduleAddr,false);
     led.clearDisplay(moduleAddr);
+    led.shutdown(moduleAddr,false);
 } }
-void displayTurnOn() {
-  displayOn = true;
+
+void displaySetIntensity(uint8_t intensity) {
+  for (int moduleAddr = 0; moduleAddr < ModuleQty; moduleAddr++) {
+    led.setIntensity(moduleAddr,intensity);
+  };
 }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void displayTest() {
   for (int module = (ModuleQty-1); module >=0 ; module--) { led.clearDisplay(module); }
   for (int module = (ModuleQty-1); module >=0 ; module--) {
@@ -377,3 +396,4 @@ void displayTest() {
     watchDogReset();
   } delay(1000);
 }
+#endif // MODE_DEBUG

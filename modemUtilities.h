@@ -1,5 +1,5 @@
 // TODO utilisé par le modem ??
-
+#if GPRS_HARDWARE
 #include <Wire.h>
 
 #if defined(SIM800L_IP5306_VERSION_20190610)
@@ -157,3 +157,5 @@ bool setupPMU()
 }
 
 #endif
+
+#endif // GPRS_HARDWARE

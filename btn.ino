@@ -40,8 +40,6 @@ void btnInit() {
   pinMode(ledDailyPin, OUTPUT);
   pinMode(ledWeeklyPin, OUTPUT);
   pinMode(ledMonthlyPin, OUTPUT);
-// Déclaration des interruptions
-  //attachInterrupt(btnTestMode, debugTestModeToggle, FALLING);
 // Fin
   debugTrace("Event","Btn initialisation OK");
   watchDogReset();
@@ -109,6 +107,7 @@ void btnReadStableValue(btnStruct &buttonRef) {
 } }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void btnTest() {
 // Détection de l'état de chaque zône tactile et retranscription sur les leds correspondantes
   btnReadStableValue(plusOneButton); if(plusOneButton.newValue) { debugTrace("Test","btn plusOneButton "+ String(plusOneButton.stableValue)); soundBip(); };  // digitalWrite(plusOneButton.pin, plusOneButton.stableValue); soundBip();
@@ -119,3 +118,4 @@ void btnTest() {
   btnReadStableValue(idPwdButton); if(idPwdButton.newValue) { debugTrace("Test","btn idPwdButton "+ String(idPwdButton.stableValue)); soundBip(); };
   btnReadStableValue(soundToggle); if(soundToggle.newValue) { debugTrace("Test","btn soundToggle "+ String(soundToggle.stableValue)); soundBip(); };
 }
+#endif // MODE_DEBUG

@@ -9,7 +9,10 @@ uint32_t timeBackupFrequency = 15000; // 15s
 
 void timeInit() {
 // Demande l'heure au modem si présent
-  if(hasModem()) { timeStampOffset = timeFromModem(); if(timeStampOffset!=0) { timeStampOffsetSynchronized=true; };};
+#if GPRS_HARDWARE
+  timeStampOffset = timeFromModem(); 
+  if(timeStampOffset!=0) { timeStampOffsetSynchronized=true; };
+#endif // GPRS_HARDWARE
 // En cas d'échec, tentative de chargement via le Wifi  
   if((timeStampOffset==0) && isWebAvailable()) { timeStampOffset = timeFromWifi(); if(timeStampOffset!=0) { timeStampOffsetSynchronized=true; };};
 // En cas d'échec, chargement de la dernière heure connue depuis le stockage non-volatile
@@ -20,6 +23,15 @@ void timeInit() {
   timeStore();
   debugTrace("Event","Time initialisation OK (" + timeFormat() +")"); 
   watchDogReset();
+}
+
+uint32_t nextTimeSelfMaintenance = 0;
+void timeSelfMaintenance() {
+  // Limitation toutes les 24H si l'horloge est synchronisée, sinon toutes les 30 minutes
+  if(time()<nextTimeSelfMaintenance) { return; }
+  nextTimeSelfMaintenance = time() + (timeStampOffsetSynchronized ? 86400 : 1800);
+  // Remise à jour de l'heure système
+  timeInit();
 }
 
 void setLocalTimeFromTimestamp(uint32_t timestamp) {
@@ -114,9 +126,11 @@ uint32_t timeFromWifi() {
 bool isTimeReliable() { return timeStampOffsetSynchronized; }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void timeTest() {
   if(timeStampOffsetSynchronized) { 
     debugTrace("Test", "Time test OK : " + String(time()));
   } else {
     debugTrace("Test", "Time test issue");
 } }
+#endif // MODE_DEBUG

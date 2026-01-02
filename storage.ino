@@ -52,7 +52,7 @@ bool storageWriteBool(const char *key, bool value) {
   return success;
 }
 
-bool webStorageWriteBool(const char *key, bool value) { return serverPostData("set-"+String(key),"format=bool&value="+String(value?"TRUE":"FALSE")); }
+bool webStorageWriteBool(const char *key, bool value, String additionalData) { return serverPostData("set-"+String(key),"format=bool&value="+String(value?"TRUE":"FALSE")+additionalData); }
 
 /*** UShort ***/
 uint16_t storageReadUShort(const char *key, uint16_t defaultValue) {
@@ -79,7 +79,7 @@ bool storageWriteUShort(const char *key, uint16_t value) {
   return success;
 }
 
-bool webStorageWriteUShort(const char *key, uint16_t value) { return serverPostData("set-"+String(key),"format=int&value="+String(value)); }
+bool webStorageWriteUShort(const char *key, uint16_t value, String additionalData) { return serverPostData("set-"+String(key),"format=int&value="+String(value)+additionalData); }
 
 /*** Int ***/
 uint32_t storageReadUInt(const char *key, uint32_t defaultValue) {
@@ -106,7 +106,7 @@ bool storageWriteUInt(const char *key, uint32_t value) {
   return success;
 }
 
-bool webStorageWriteUInt(const char *key, uint32_t value) { return serverPostData("set-"+String(key),"format=string&value="+String(value)); }
+bool webStorageWriteUInt(const char *key, uint32_t value, String additionalData) { return serverPostData("set-"+String(key),"format=int&value="+String(value)+additionalData); }
 
 /*** String ***/
 String storageReadString(const char *key, String defaultValue) {
@@ -133,7 +133,7 @@ bool storageWriteString(const char *key, String value) {
   return success;
 }
 
-bool webStorageWriteString(const char *key, String value) { return serverPostData("set-"+String(key),"value="+value); }
+bool webStorageWriteString(const char *key, String value, String additionalData) { return serverPostData("set-"+String(key),"value="+value+additionalData); }
 
 bool storageRemove(const char *key) { 
   bool autoOpenclose = (storageIsOpened==false);
@@ -156,21 +156,18 @@ void storageCompact() {
   }
 }
 
-
-
 uint32_t nextStorageSelfMaintenance = 0;
 void storageSelfMaintenance() {
   if(time()<nextStorageSelfMaintenance) { return; } // Limitation toutes les 12H
   nextStorageSelfMaintenance = time() + 12*3600;
-  if(resetStorage()) { storageFullReset(); setStorageReseted(); debugTrace("Event", "Storage reset"); };
   storageCompact();
   nvs_stats_t nvs_stats;
   esp_err_t err = nvs_get_stats("nvs", &nvs_stats);
   if (err == ESP_OK) {
-    webStorageWriteUShort(storageKeyStorageUsedEntries,nvs_stats.used_entries);
-    webStorageWriteUShort(storageKeyStorageFreeEntries,nvs_stats.free_entries);
-    webStorageWriteUShort(storageKeyStorageTotalEntries,nvs_stats.total_entries);
-    webStorageWriteUShort(storageKeyStorageNamespaceCount,nvs_stats.namespace_count);
+    webStorageWriteUShort(storageKeyStorageUsedEntries,nvs_stats.used_entries,"");
+    webStorageWriteUShort(storageKeyStorageFreeEntries,nvs_stats.free_entries,"");
+    webStorageWriteUShort(storageKeyStorageTotalEntries,nvs_stats.total_entries,"");
+    webStorageWriteUShort(storageKeyStorageNamespaceCount,nvs_stats.namespace_count,"");
   }
   uint16_t h1Entries = 0;
   uint16_t h3Entries = 0;
@@ -204,6 +201,7 @@ void storageFullReset() {
 }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void storageTest() {
   bool testOk = true;
   // Test d'écriture / relecture local
@@ -217,3 +215,4 @@ void storageTest() {
   if(aleaInit!=aleaCheck) { testOk = false; errorLog(708,"Storage test web write/read error"); };
   if(testOk) { debugTrace("Test","Storage test Ok"); } else { debugTrace("Test","Storage test issue"); };
 }
+#endif // MODE_DEBUG

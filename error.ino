@@ -22,6 +22,7 @@ void errorLog(int errorId, String errorDescription) {
   }
   
   // Limiter la longueur du message
+  errorDescription.replace("\"", " ");
   errorDescription = "Error " + String(errorId) + " : " + errorDescription;
   if (errorDescription.length() > MAX_ERROR_LENGTH) { errorDescription = errorDescription.substring(0, MAX_ERROR_LENGTH); }
   
@@ -41,10 +42,8 @@ void errorQueueProcess() {
   // Récupérer l'erreur la plus ancienne
   String errorToSend = errorQueue.errors[errorQueue.tail];
   
-  // Tenter d'envoyer au serveur
-  bool success = serverPostData("errorLog", "value=" + errorToSend);
-  
-  if (success) {
+  // Tenter d'envoyer au serveur  
+  if (serverPostData("errorLog", "value='" + errorToSend + "'")=="Ok") {
     errorQueue.errors[errorQueue.tail] = "";
     errorQueue.tail = (errorQueue.tail + 1) % MAX_ERROR_QUEUE;
     errorQueue.count--;

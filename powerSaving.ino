@@ -8,13 +8,10 @@ void powerSavingInit() {
   debugTrace("Event","Power Saving TO DEV ...");
 
   // Test désactivation Bluetooth : disableBluetooth();
-  // Test désactivation radar hors action
   // Test désactivation wifi
   // passer l'écran en mode économie d'énergie
   // éteindre l'écran sur historique de présence + détection radar
-  // passer l'esp32 en veille avec wake-up via les zones tactiles, voir activer la sortie radar 
-  // Passer le radar en mode out  https://github.com/ncmreynolds/ld2410
-  // Logger les commandes 
+  // passer l'esp32 en veille avec wake-up via les zones tactiles, voir activer la sortie radar  
   // Tester de ralentir l'esp32 via delay ou via son horloge
 
   watchDogReset();
@@ -27,6 +24,13 @@ void disableBluetooth() {
   //esp_bt_controller_deinit();
 }
 
-void powerSavingLoop() {
-  debugTrace("TODO","powerSavingLoop not dev");
+int previousIdleStatus = 0;
+void powerSavingOnIdle(uint32_t idleSeconds) {
+  if(idleSeconds > powerSavingIdleTime) {
+    if(previousIdleStatus!=2) { previousIdleStatus = 2; displayTurnOff(); serverPostData("powerSaving","Off"); };
+  } else if(idleSeconds > powerSavingAttenuationTime) {
+    if(previousIdleStatus!=1) { previousIdleStatus = 1; displaySetIntensity(7); };
+  } else {
+    if(previousIdleStatus!=0) { previousIdleStatus = 0; displayTurnOn(); serverPostData("powerSaving","On"); };
+  }
 }

@@ -219,8 +219,8 @@ void setDailyMode() {
   digitalWrite(ledMonthlyPin,LOW);
   counterUnit = 1;
   storageWriteUShort(storageKeyCounterUnit, counterUnit);
-  webStorageWriteUShort(storageKeyCounterUnit, counterUnit);
-  debugTrace("Event","Set daily mode / radar : " + radarDistanceGet() );
+  webStorageWriteUShort(storageKeyCounterUnit, counterUnit, "&radar="+radarDistanceGet());
+  debugTrace("Event","Set daily mode / radar : " + radarDistanceGet());
 }
 
 void setWeeklyMode() {
@@ -229,7 +229,7 @@ void setWeeklyMode() {
   digitalWrite(ledMonthlyPin,LOW);
   counterUnit = 7;
   storageWriteUShort(storageKeyCounterUnit, counterUnit);
-  webStorageWriteUShort(storageKeyCounterUnit, counterUnit);
+  webStorageWriteUShort(storageKeyCounterUnit, counterUnit, "&radar="+radarDistanceGet());
   debugTrace("Event","Set weekly mode / radar : "+radarDistanceGet());
 }
 
@@ -239,8 +239,8 @@ void setMonthlyMode() {
   digitalWrite(ledMonthlyPin,HIGH);
   counterUnit = 30;
   storageWriteUShort(storageKeyCounterUnit, counterUnit);
-  webStorageWriteUShort(storageKeyCounterUnit, counterUnit);
-  debugTrace("Event","Set monthly mode / radar : "+radarDistanceGet() );
+  webStorageWriteUShort(storageKeyCounterUnit, counterUnit, "&radar="+radarDistanceGet());
+  debugTrace("Event","Set monthly mode / radar : "+radarDistanceGet());
 }
 
 int counterToDisplay() {
@@ -253,6 +253,7 @@ int counterToDisplay() {
 }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void counterTestValues(int16_t valuesCount) {
   if(valuesCount >= 0) {
     debugTrace("debug","Chargement test de " + String(valuesCount) + " events");
@@ -359,3 +360,4 @@ void counterDetailsDisplay() {
   } 
   storageClose();
 }  
+#endif // MODE_DEBUG

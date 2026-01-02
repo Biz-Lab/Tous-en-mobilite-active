@@ -45,8 +45,10 @@ void soundConfigToggle() {
 }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void soundTest() {
   displayShow2Lines("Son","Ok",3); soundOk(); delay(2000); watchDogReset();
   displayShow2Lines("Son","Ko",3); soundKo(); delay(2000); watchDogReset();
   displayShow2Lines("Son","Bip",3); soundBip(); delay(2000); watchDogReset();
 }
+#endif // MODE_DEBUG

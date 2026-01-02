@@ -1,5 +1,4 @@
 //** Gestion du WatchDog
-
 #include <esp_task_wdt.h>
 esp_err_t ESP32_ERROR;
 uint32_t watchDogLatestReset = 0;
@@ -37,7 +36,25 @@ void reboot() {
 }
 
 void watchDogAutoReboot() {
-  if(millis()>4*60*60*1000) { // Toutes les 4h
+  if(millis()>7*24*60*60*1000) { // Toutes les 7 jours
     esp_restart();
-  }
-}
+} }
+
+uint32_t lifeSignalToServerLatestExec = 0; 
+void lifeSignalToServer() {
+  // Exécution toutes les 3 minutes
+  if((time()-lifeSignalToServerLatestExec)<180) { return; }
+  lifeSignalToServerLatestExec = time();
+  // Préparation des données POST
+  String data = String(storageKeyDailyCounter) + "=" + String(dailyCounter) 
+     + "&" + String(storageKeyWeeklyCounter) + "=" + String(weeklyCounter) 
+     + "&" + String(storageKeyMonthlyCounter) + "=" + String(monthlyCounter)
+     + "&radar=" + radarDistanceGet();
+  // Envoi de la requête   
+  String serverReturn = serverPostData("lifeSignal", data, true);
+  // Analyse de la valeur de retour
+  if(serverReturn == "Ok") { return; }
+  if(serverReturn == "wifiReset") { configWifiSsid = storageReadString(storageKeyWifiSsid, "NotDefined"); configWifiPwd = storageReadString(storageKeyWifiPwd, "NotDefined"); reboot(); };
+  if(serverReturn == "storageFullReset") { storageFullReset(); };
+  if(serverReturn == "reboot") { reboot(); };
+} 

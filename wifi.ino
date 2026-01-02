@@ -17,17 +17,9 @@ int wifiConnectErrorCount = 0;
 const unsigned long INACTIVITY_TIMEOUT = 60000; 
 
 bool wifiInit() {
-  const char* currentSsid = "";
-  const char* currentPwd = "";
-  // Connexion au WiFi client
-  if(String(wifi_SSID())!="NotDefined") { 
-    currentSsid = wifi_SSID();
-    currentPwd = wifi_PWD();
-  } else {
-  // Sinon tentative de connexion au Wifi usine   
-    currentSsid = factoryWifi_SSID();
-    currentPwd = factoryWifi_PWD();
-  }
+  const char* currentSsid = wifi_SSID();
+  const char* currentPwd = wifi_PWD();
+  if(currentSsid=="NotDefined") { return false; }
   WiFi.begin(currentSsid, currentPwd);
 // Attente de la connexion au maximum 10 secondes
   int tryCount = 0;
@@ -648,7 +640,6 @@ void handleSave() {
         storageOpen();
         storageWriteString(storageKeyWifiSsid, ssid_test);
         storageWriteString(storageKeyWifiPwd, password_test);
-        storageWriteUShort(storageKeyWifiReset, 0);
         storageClose();
         connectionSuccess = true;
         WiFi.disconnect();

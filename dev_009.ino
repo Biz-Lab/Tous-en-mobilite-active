@@ -1,6 +1,10 @@
 #include <Arduino.h>
 #include <headers.h>
-int currentSoftwareVersion() { return 122; }
+#define CURRENT_SOFTWARE_VERSION 142
+#define MODE_DEBUG false // TODO A DESACTIVER
+#define GPRS_HARDWARE false
+#define FACTORY_WIFI_SSID "xxxxxx"
+#define FACTORY_WIFI_PWD "xxxxxxx"
 
 void setup() {
   debugInit();               // Initialisation du port série en mode debug
@@ -11,7 +15,6 @@ void setup() {
   wifiInit();                // Connexion au Wifi
   factorySetup();            // Chargement de la configuration usine
   //modemInit();             // Connexion 4G ## A DEVELOPER ##
-  checkConfigOverTheWeb();   // Chargement de la configuration stockée sur le serveur
   timeInit();                // Initialisation de l'horloge interne
   radarInit();               // Initialisation du radar
   powerSavingInit();         // Initialisation du mode d'économie d'énergie ## A DEVELOPER ##
@@ -20,7 +23,7 @@ void setup() {
   countersInit();            // Chargement des données depuis la mémoire non volatile
   debugTrace("Event","-- End of initialisations --");
   //counterTestValues((int16_t)serverGetInt("getTestSize",1));
-  // durcir et tester les  boucles d'erreurs pour éviter de tomber en wathcdog
+  // TODO : durcir et tester les  boucles d'erreurs pour éviter de tomber en wathcdog
   //displaytest99();
   //counterDetailsDisplay();
   //counterTestValues(360);
@@ -30,11 +33,11 @@ void loop() {
   radarLoop();
   btnLoop();
   displayCounter();
-  //displaytest99();
   watchDogReset();
   timeStore();
   wifiCheck();
   storageSelfMaintenance();
   errorQueueProcess();
   watchDogAutoReboot();
+  lifeSignalToServer();
 }

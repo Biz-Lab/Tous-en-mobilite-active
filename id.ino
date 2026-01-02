@@ -63,6 +63,12 @@ void factorySetup() {
   bool setupDone = true;
   // Vérification si le micro-controleur est bien en mode de configuration usine
   if(!isFactorySetupMode()) { return; }
+  // Mise en place des codes wifi usine
+  if(wifi_PWD()=="NotDefined") {
+    storageWriteString(storageKeyWifiSsid, FACTORY_WIFI_SSID);
+    storageWriteString(storageKeyWifiPwd, FACTORY_WIFI_PWD);
+    reboot();
+  }
   // Vérification de la connexion internet
   if(!isWebAvailable()) { return; }
   // Vérification que l'id produit et version hardware sont bien à charger
@@ -167,7 +173,8 @@ void idPwdAction() {
 }
 
 // ** Fonction test ****************** 
+#if MODE_DEBUG
 void idTest() {
   displayShow2Lines("Login",idGet(),10);
 }
-
+#endif // MODE_DEBUG

@@ -18,13 +18,7 @@
 #define soundPin 37
 
 // Clés de stockages
-#define storageKeyDebugMode "k1"
 #define storageKeySoundActif "k2"
-#define storageKeyRadarProximityEntryThreshold "kL"
-#define storageKeyRadarProximityExitThreshold "k3"
-#define storageKeyNewUserMinDelay "k4"
-#define storageKeyNewUserMaxDelay "k5"
-#define storageKeyWifiReset "k7"
 #define storageKeyWifiSsid "k8"
 #define storageKeyWifiPwd "k9"
 #define storageKeyDailyCounter "kA"
@@ -40,11 +34,7 @@
 #define storageKeyStorageFreeEntries "kO"
 #define storageKeyStorageTotalEntries "kP"
 #define storageKeyStorageNamespaceCount "kQ"
-#define storageKeyStorageToReset "kK"
 #define storageKeyCurrentFirmwareVersion "kS"
-
-// debug.ino
-//void IRAM_ATTR debugTestModeToggle();
 
 // storage.ino
 void storageOpen();
@@ -52,12 +42,20 @@ void storageClose();
 void storageInit();
 bool storageReadBool(const char *key, bool defaultValue = false);
 bool storageWriteBool(const char *key, bool value);
+bool webStorageReadBool(const char *key, bool defaultValue);
+bool webStorageWriteBool(const char *key, bool value, String additionalData = "");
 uint16_t storageReadUShort(const char *key, uint16_t defaultValue = 0);
 bool storageWriteUShort(const char *key, uint16_t value);
+uint16_t webStorageReadUShort(const char *key, uint16_t defaultValue = 0);
+bool webStorageWriteUShort(const char *key, uint16_t value, String additionalData = "");
 uint32_t storageReadUInt(const char *key, uint32_t defaultValue = 0);
 bool storageWriteUInt(const char *key, uint32_t value);
+uint32_t webStorageReadUInt(const char *key, uint32_t defaultValue = 0);
+bool webStorageWriteUInt(const char *key, uint32_t value, String additionalData = "");
 String storageReadString(const char *key, String defaultValue = "");
 bool storageWriteString(const char *key, String value);
+String webStorageReadString(const char *key, String defaultValue = "");
+bool webStorageWriteString(const char *key, String value, String additionalData = "");
 bool storageRemove(const char *key);
 
 // id.ino
@@ -79,6 +77,9 @@ void counterTestValues(int16_t valuesCount);
 // display.ino
 void displayShowMonoLine(String text, int duration=0);
 void displayShow2Lines(String line1, String line2, int duration);
+void displayTurnOff();
+void displayTurnOn();
+void displaySetIntensity(uint8_t intensity);
 
 // displayControl.ino
 class LedControl {
@@ -105,6 +106,22 @@ class LedControl {
       void setColumn(int addr, int col, byte value);
 };
 
+// powerSaving.ino
+#define powerSavingAttenuationTime 180 // 180 secondes = 3 minutes
+#define powerSavingIdleTime 900 // 900 secondes = 15 minutes
+void powerSavingOnIdle(uint32_t idleSeconds);
+
+// radar.ino
+#define RadarProximityExitThreshold 160 // cm
+#define newUserMinDelay 3 // secondes
+#define newUserMaxDelay 30 // secondes
+void radarInit();
+void radarLoop();
+String radarDistanceGet();
+bool radarNewUser();
+void radarDisableUser();
+bool radarUserPresence();
+
 // sound.ino 
 void soundOk(bool forceSoundActif = false);
 void soundKo(bool forceSoundActif = false);
@@ -120,14 +137,12 @@ struct FontDefStruct {
 };
 
 // web.ino
-bool webStorageReadBool(const char *key, bool defaultValue);
-bool webStorageWriteBool(const char *key, bool value);
-uint16_t webStorageReadUShort(const char *key, uint16_t defaultValue);
-bool webStorageWriteUShort(const char *key, uint16_t value);
 String serverGetString(String dataKey);
 int32_t serverGetInt(String dataKey, uint32_t defaultValue=-1);
-bool serverPostData(String action, String data = "");
+String serverPostData(String action, String data = "", bool getServerReturn = false);
 
 // time.ino
+void timeInit();
+void timeSelfMaintenance();
 uint32_t time();
 bool isTimeReliable();
