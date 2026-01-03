@@ -1,10 +1,10 @@
-#include <Arduino.h>
-#include <headers.h>
 #define CURRENT_SOFTWARE_VERSION 142
 #define MODE_DEBUG false // TODO A DESACTIVER
 #define GPRS_HARDWARE false
 #define FACTORY_WIFI_SSID "xxxxxx"
 #define FACTORY_WIFI_PWD "xxxxxxx"
+#include <Arduino.h>
+#include <headers.h>
 
 void setup() {
   debugInit();               // Initialisation du port série en mode debug
