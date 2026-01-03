@@ -31,6 +31,6 @@ void powerSavingOnIdle(uint32_t idleSeconds) {
   } else if(idleSeconds > powerSavingAttenuationTime) {
     if(previousIdleStatus!=1) { previousIdleStatus = 1; displaySetIntensity(7); };
   } else {
-    if(previousIdleStatus!=0) { previousIdleStatus = 0; displayTurnOn(); serverPostData("powerSaving","On"); };
+    if(previousIdleStatus!=0) { previousIdleStatus = 0; displayTurnOn(); serverPostData("powerSaving","On"); displayShow2Lines("Power","On",5); };
   }
 }

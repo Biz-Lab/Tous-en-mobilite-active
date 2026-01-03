@@ -31,8 +31,6 @@ uint32_t radarPresenceIdleSeconds = 0;
 
 #define smoothedRatio 0.05
 void radarLoop() {
-  // Activation du radar uniquement après une actions utilisateur
-  // if(radarIsNewUser) { return; };
   // Lecture des données du radar et lissage de la mesure pour éviter les faux positifs
   radar.read();
   uint16_t realTimeStationaryDistance = 300;

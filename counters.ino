@@ -3,11 +3,6 @@
 #include <nvs.h>
 #include <Preferences.h>
 
-// Variables internes
-uint16_t dailyCounter;
-uint16_t weeklyCounter;
-uint16_t monthlyCounter;
-
 // Agrégation par intervalles multiples pour optimiser l'espace
 const uint32_t SLOT_1H_DURATION = 3600;     // 1 heure en secondes (pour compteur 24h)
 const uint32_t SLOT_3H_DURATION = 3*3600;   // 3 heures en secondes (pour compteur 7j)
@@ -17,7 +12,7 @@ int counterUnit = 1;
 uint32_t nextCounterUpdate = 0;
 
 // Obtenir les slots actuels pour chaque durée
-#define timeStampStart 1735686000
+#define timeStampStart 1735686000 // Timestamp hardcodé = 01/01/2025
 uint32_t getCurrentSlot1H() { return (time()-timeStampStart) / SLOT_1H_DURATION; }
 uint32_t getCurrentSlot3H() { return (time()-timeStampStart) / SLOT_3H_DURATION; }
 uint32_t getCurrentSlot6H() { return (time()-timeStampStart) / SLOT_6H_DURATION; }

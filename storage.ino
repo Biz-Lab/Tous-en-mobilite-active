@@ -1,7 +1,6 @@
 //** Gestion du stockage non-volatile
 #include <nvs_flash.h>
 #include <Preferences.h>
-#include <nvs_flash.h>
 #include <nvs.h>
 Preferences disk;
 

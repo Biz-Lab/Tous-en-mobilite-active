@@ -35,6 +35,7 @@ void loop() {
   displayCounter();
   watchDogReset();
   timeStore();
+  timeSelfMaintenance();
   wifiCheck();
   storageSelfMaintenance();
   errorQueueProcess();

@@ -57,6 +57,8 @@ bool storageWriteString(const char *key, String value);
 String webStorageReadString(const char *key, String defaultValue = "");
 bool webStorageWriteString(const char *key, String value, String additionalData = "");
 bool storageRemove(const char *key);
+void storageSelfMaintenance();
+void storageFullReset();
 
 // id.ino
 String idGet();
@@ -67,6 +69,9 @@ String smallHmacCompute(String messageToHash);
 void factorySetup();
 
 // counters.ino
+uint16_t dailyCounter;
+uint16_t weeklyCounter;
+uint16_t monthlyCounter;
 void countersInit();
 void countersSave();
 void countersInc();
@@ -75,11 +80,13 @@ void countersPrint();
 void counterTestValues(int16_t valuesCount);
 
 // display.ino
+void displayInit();
 void displayShowMonoLine(String text, int duration=0);
 void displayShow2Lines(String line1, String line2, int duration);
 void displayTurnOff();
 void displayTurnOn();
 void displaySetIntensity(uint8_t intensity);
+void displayCounter();
 
 // displayControl.ino
 class LedControl {
@@ -109,6 +116,7 @@ class LedControl {
 // powerSaving.ino
 #define powerSavingAttenuationTime 180 // 180 secondes = 3 minutes
 #define powerSavingIdleTime 900 // 900 secondes = 15 minutes
+void powerSavingInit();
 void powerSavingOnIdle(uint32_t idleSeconds);
 
 // radar.ino
@@ -136,10 +144,16 @@ struct FontDefStruct {
   const void* fontData;  // Pointeur générique vers les données de la police
 };
 
+// ota.ino
+void otaInit();
+
 // web.ino
 String serverGetString(String dataKey);
 int32_t serverGetInt(String dataKey, uint32_t defaultValue=-1);
 String serverPostData(String action, String data = "", bool getServerReturn = false);
+
+// wifi.ino
+void wifiSetup();
 
 // time.ino
 void timeInit();
